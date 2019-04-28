@@ -6,10 +6,16 @@
 <script type="text/javascript">
 
 $(document).ready(()=> {
-    
     console.log('start here')
     
+    var size = [400, 400];
+    var mscrn = $('div#m_screen');
+    var cvs = new m_canvas(mscrn, size);
     
+    var rad = 150;
+    var nm_src = new m_matrix(nm_sphere(rad, size));
+    
+    cvs.draw(nm_src.srcm[2]);
     
 })
 
