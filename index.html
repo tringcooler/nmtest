@@ -9,7 +9,7 @@ $(document).ready(()=> {
     console.log('start here')
     
     var size = [400, 400];
-    var mcvs = new m_canvas(600, 150)
+    var mcvs = new m_canvas(600, 550)
     $('div#m_screen').append(mcvs.elem);
     
     var rad = 150;
@@ -19,13 +19,32 @@ $(document).ready(()=> {
         new m_canvas(...size),
         new m_canvas(...size),
     ];
-    nm_src = new m_matrix(nm_sphere(rad, size));
+    var nm_src = new m_matrix(nm_sphere(size, rad));
     
     [0, 1, 2].map(i => src_cvs[i].draw(nm_src.srcm[i], i));
     src_cvs[3].draw(nm_src.srcm);
     
     [0, 1, 2, 3].map(i => {
         mcvs.drawfrom(src_cvs[i], i * 150, 0, 150, 150);
+    });
+    
+    var light_cvs = new m_canvas(...size);
+    var dst_cvs = new m_canvas(...size);
+    
+    var drawlight = function(x, y) {
+        var nm_light = new m_matrix(m_light(size, [x, y, 100], [0.1, 0.006, 0.00002]));
+        light_cvs.draw(nm_light.srcm);
+        mcvs.drawfrom(light_cvs, 450, 150, 150, 150);
+        
+        var m_dst = nm_src.dot(nm_light);
+        dst_cvs.draw(m_dst, null, false);
+        mcvs.drawfrom(dst_cvs, 0, 150);
+    };
+    
+    drawlight(250, 250);
+    
+    mcvs.elem.on('click', function(e) {
+        drawlight(e.offsetX, e.offsetY - 150);
     });
 })
 

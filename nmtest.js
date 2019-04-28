@@ -19,10 +19,15 @@ var m_canvas = (function() {
         this.height = this.cvs.height;
     };
     
-	m_canvas.prototype.draw = function(mmv, rgbidx = null) {
+	m_canvas.prototype.draw = function(mmv, rgbidx = null, neg = true) {
         idata = this.ctx.createImageData(this.width, this.height);
         var ilen = idata.width * idata.height * 4;
-        var unnm = a => (a + 1) / 2 * 255;
+        var unnm;
+        if(neg) {
+            unnm = a => (a + 1) / 2 * 255;
+        } else {
+            unnm = a => Math.max(a, 0) * 255;
+        }
         for(var i = 0; i < ilen; i += 4) {
             if(mmv.length == 3) {
                 idata.data[i + 0] = unnm(mmv[0][i/4]);
@@ -78,10 +83,20 @@ var m_matrix = (function() {
     };
     
     m_matrix.prototype.dot = function(dst) {
-        
+        /*var m1 = this.e_op('*', this.srcm, dst.srcm);
+        return this.e_op('+', this.e_op('+',
+            m1[0], m1[1]), m1[2]);*/
+        var r = [];
+        for(var i = 0; i < this.srcm[0].length; i++) {
+            var ri = this.srcm[0][i] * dst.srcm[0][i] +
+                this.srcm[1][i] * dst.srcm[1][i] +
+                this.srcm[2][i] * dst.srcm[2][i]
+            r.push(ri);
+        }
+        return r;
     };
     
-	m_matrix.prototype.bright = function() {
+	m_matrix.prototype.abs = function() {
         return this.e_op('Math.sqrt',
             this.e_op('+',
             this.e_op('+',
@@ -95,7 +110,7 @@ var m_matrix = (function() {
     
 })();
 
-var nm_sphere = function(rad, size, cent = null) {
+var nm_sphere = function(size, rad, cent = null) {
     if(cent == null) {
         cent = size.map(a=>Math.floor(a/2));
     }
@@ -109,10 +124,10 @@ var nm_sphere = function(rad, size, cent = null) {
             v = [x, y, Math.sqrt(r2 - d2)];
         }
         return v.map(a=>a/r);
-    }
+    };
     var r = [[], [], []];
-    for(var x = 0; x < size[0]; x ++) {
-        for(var y = 0; y < size[1]; y ++) {
+    for(var y = 0; y < size[1]; y ++) {
+        for(var x = 0; x < size[0]; x ++) {
             var d = calc_v(x - cent[0], y - cent[1], rad);
             [0,1,2].map(i=>r[i].push(d[i]));
         }
@@ -120,6 +135,30 @@ var nm_sphere = function(rad, size, cent = null) {
     return r;
 };
 
-var m_light = function(x, y, z) {
-    
+var m_light = function(size, src, att = [1, 0, 0]) {
+    var calc_v = function(x, y, z) {
+        var d = Math.sqrt(x * x + y * y + z * z);
+        var datt = att[0] + att[1] * d + att[2] * d * d;
+        return [x, y, z].map(a=>a/d/datt);
+    };
+    var r = [[], [], []];
+    for(var y = 0; y < size[1]; y ++) {
+        for(var x = 0; x < size[0]; x ++) {
+            var d = calc_v(x - src[0], y - src[1], src[2]);
+            [0,1,2].map(i=>r[i].push(d[i]));
+        }
+    }
+    return r;
 };
+
+/*var m_light_att = function(m_s, att) {
+    var mm = new m_matrix(m_s);
+    var md = mm.abs();
+    var nm = mm.e_op('/', m_s, md);
+    var matt = mm.e_op('+',
+        mm.e_op('+', att[0],
+            mm.e_op('*', att[1], md)),
+            mm.e_op('*', att[2],
+                mm.e_op('Math.pow', md, 2)));
+    return mm.e_op('/', nm, matt);
+};*/
