@@ -1,14 +1,13 @@
 
 var m_canvas = (function() {
     
-	function m_canvas(parent, size = [300, 300]) {
+	function m_canvas(width, height) {
         var canvas = $('<canvas>');
         //canvas.width(size[0]);
         //canvas.height(size[1]);
         //issue for canvas resize
-        canvas.attr('width', size[0]);
-        canvas.attr('height', size[1]);
-        parent.append(canvas);
+        canvas.attr('width', width);
+        canvas.attr('height', height);
         this.elem = canvas;
         this.cvs = canvas.get(0)
         this.sync_meta();
@@ -23,15 +22,16 @@ var m_canvas = (function() {
 	m_canvas.prototype.draw = function(mmv) {
         idata = this.ctx.createImageData(this.width, this.height);
         var ilen = idata.width * idata.height * 4;
+        var unnm = a => (a + 1) / 2 * 255;
         for(var i = 0; i < ilen; i += 4) {
             if(mmv.length == 3) {
-                idata.data[i + 0] = mmv[0][i/4] * 255;
-                idata.data[i + 1] = mmv[1][i/4] * 255;
-                idata.data[i + 2] = mmv[2][i/4] * 255;
+                idata.data[i + 0] = unnm(mmv[0][i/4]);
+                idata.data[i + 1] = unnm(mmv[1][i/4]);
+                idata.data[i + 2] = unnm(mmv[2][i/4]);
             } else {
-                idata.data[i + 0] = mmv[i/4] * 255;
-                idata.data[i + 1] = mmv[i/4] * 255;
-                idata.data[i + 2] = mmv[i/4] * 255;
+                idata.data[i + 0] = unnm(mmv[i/4]);
+                idata.data[i + 1] = unnm(mmv[i/4]);
+                idata.data[i + 2] = unnm(mmv[i/4]);
             }
             idata.data[i + 3] = 255;
         }
