@@ -9,7 +9,7 @@ $(document).ready(()=> {
     console.log('start here')
     
     var size = [400, 400];
-    var mcvs = new m_canvas(800, 200)
+    var mcvs = new m_canvas(600, 150)
     $('div#m_screen').append(mcvs.elem);
     
     var rad = 150;
@@ -21,11 +21,11 @@ $(document).ready(()=> {
     ];
     nm_src = new m_matrix(nm_sphere(rad, size));
     
-    [0, 1, 2].map(i => src_cvs[i].draw(nm_src.srcm[i]));
+    [0, 1, 2].map(i => src_cvs[i].draw(nm_src.srcm[i], i));
     src_cvs[3].draw(nm_src.srcm);
     
     [0, 1, 2, 3].map(i => {
-        mcvs.drawfrom(src_cvs[i], i * 200, 0, 200, 200);
+        mcvs.drawfrom(src_cvs[i], i * 150, 0, 150, 150);
     });
 })
 

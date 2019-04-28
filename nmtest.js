@@ -19,7 +19,7 @@ var m_canvas = (function() {
         this.height = this.cvs.height;
     };
     
-	m_canvas.prototype.draw = function(mmv) {
+	m_canvas.prototype.draw = function(mmv, rgbidx = null) {
         idata = this.ctx.createImageData(this.width, this.height);
         var ilen = idata.width * idata.height * 4;
         var unnm = a => (a + 1) / 2 * 255;
@@ -29,9 +29,10 @@ var m_canvas = (function() {
                 idata.data[i + 1] = unnm(mmv[1][i/4]);
                 idata.data[i + 2] = unnm(mmv[2][i/4]);
             } else {
-                idata.data[i + 0] = unnm(mmv[i/4]);
-                idata.data[i + 1] = unnm(mmv[i/4]);
-                idata.data[i + 2] = unnm(mmv[i/4]);
+                [0, 1, 2].map(j => {
+                    if(rgbidx === null || rgbidx == j)
+                        idata.data[i + j] = unnm(mmv[i/4]);
+                });
             }
             idata.data[i + 3] = 255;
         }
@@ -74,6 +75,10 @@ var m_matrix = (function() {
             r.push(this.e_op(op, a[i], b[i]));
         }
         return r;
+    };
+    
+    m_matrix.prototype.dot = function(dst) {
+        
     };
     
 	m_matrix.prototype.bright = function() {
