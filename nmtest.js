@@ -38,6 +38,10 @@ var m_canvas = (function() {
         this.ctx.putImageData(idata, 0, 0);
     };
     
+    m_canvas.prototype.drawfrom = function(cvs, ...args) {
+        this.ctx.drawImage(cvs.cvs, ...args);
+    };
+    
     return m_canvas;
     
 })();
@@ -109,4 +113,8 @@ var nm_sphere = function(rad, size, cent = null) {
         }
     }
     return r;
-}
+};
+
+var m_light = function(x, y, z) {
+    
+};

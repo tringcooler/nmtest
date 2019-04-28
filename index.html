@@ -9,14 +9,24 @@ $(document).ready(()=> {
     console.log('start here')
     
     var size = [400, 400];
-    var cvs = new m_canvas(...size);
-    $('div#m_screen').append(cvs.elem);
+    var mcvs = new m_canvas(800, 200)
+    $('div#m_screen').append(mcvs.elem);
     
     var rad = 150;
+    var src_cvs = [
+        new m_canvas(...size),
+        new m_canvas(...size),
+        new m_canvas(...size),
+        new m_canvas(...size),
+    ];
     nm_src = new m_matrix(nm_sphere(rad, size));
     
-    cvs.draw(nm_src.srcm);
+    [0, 1, 2].map(i => src_cvs[i].draw(nm_src.srcm[i]));
+    src_cvs[3].draw(nm_src.srcm);
     
+    [0, 1, 2, 3].map(i => {
+        mcvs.drawfrom(src_cvs[i], i * 200, 0, 200, 200);
+    });
 })
 
 </script>
